@@ -54,3 +54,15 @@ CHECK_FIlE_INTEGRITY = True
 ```
 
 To change any of these settings, simply edit `config.py` and run `main.py`.
+
+## IS THIS LEGAL?
+Yes! Under jw.org's [terms of use](https://www.jw.org/en/terms-of-use/#link2):
+```
+You may not:
+...
+Create for distribution purposes, any software applications, tools, or techniques
+that are specifically made to collect, copy, download, extract, harvest, or scrape
+data, HTML, images, or text from this site. (This does not prohibit the distribution
+of free, non-commercial applications designed to download electronic files such as
+EPUB, PDF, MP3, and MP4 files from public areas of this site.)
+```
