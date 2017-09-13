@@ -25,8 +25,8 @@ in the `downloaders` variable in `main.py`.
 
 
 ### Defaults
+The following is the default `config.py`:
 ```
-The following is the default `config.py`.
 PROXY_DICT = {
     "http": "",
     "https": "",
