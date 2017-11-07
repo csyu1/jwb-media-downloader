@@ -1,16 +1,26 @@
-from downloaders import *
-from constants import CATEGORIES
+from jwb_downloader.config import DATED_CATEGORIES
+from jwb_downloader.core.category_crawler import update_categories
+from jwb_downloader.core import JWBroadcastingVideoDownloader
+from jwb_downloader.core import JWBroadcastingAudioDownloader
+from jwb_downloader.downloaders import BibleBooksDownloader
+from jwb_downloader.downloaders import NWTAudioDownloader
 
-# TODO: be more user-friendly
 if __name__ == '__main__':
-    downloaders = [
-        MorningWorshipDownloader,
-        OriginalSongsDownloader,
-        BibleBooksDownloader,
-        NWTAudioDownloader,
-        VODOriginalSongsDownloader,
-    ]
-    for index, downloader in enumerate(downloaders):
-        print("Downloading " + CATEGORIES[index])
-        dl = downloaders[index]()
-        dl()
+    categories = update_categories()
+    for key, value in categories['video'].items():
+        if value == 1:
+            if key == 'BibleBooks':
+                # different title format based on Bible ordering
+                downloader = BibleBooksDownloader()
+            else:
+                downloader = JWBroadcastingVideoDownloader(key, dated_title=key in DATED_CATEGORIES)
+            downloader()
+
+    for key, value in categories['audio'].items():
+        if value == 1:
+            if key == 'NWTAudio':
+                # different download methods since downloaded from jw.org instead of tv.jw.org API
+                downloader = NWTAudioDownloader()
+            else:
+                downloader = JWBroadcastingAudioDownloader(key)
+            downloader()

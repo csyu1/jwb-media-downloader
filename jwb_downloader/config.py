@@ -13,12 +13,10 @@ VIDEO_QUALITY = '240p'
 DOWNLOAD_ROOT = 'files/%s/' % (LANGUAGE_KEY,)
 WITH_SUBTITLES = False
 
-DOWNLOAD_PATH = {
-    'Morning Worship': DOWNLOAD_ROOT + 'morning_worship/',
-    'Original Songs': DOWNLOAD_ROOT + 'original_songs/',
-    'Bible Books': DOWNLOAD_ROOT + 'bible_books/',
-    'New World Translation Audio': DOWNLOAD_ROOT + 'nwt_audio/',
-    'Original Songs Music Video': DOWNLOAD_ROOT + 'original_songs_vod/',
-}
-
 CHECK_FIlE_INTEGRITY = True
+
+DATED_CATEGORIES = [
+    'VODPgmEvtMorningWorship',
+]
+
+CHECK_FOR_NEW_CATEGORIES = True

@@ -8,20 +8,13 @@ cd jwb-media-downloader/
 pip install -r requirements.txt
 ```
 
-So far, only the following primary categories are supported for download:
-* Morning Worship
-* Original Songs
-* Introduction to Bible Books videos
-* NWT Audio Recordings
-* Original Songs Music Videos
-
 To run the downloader, simply run
 ```
 python main.py
 ```
 
-By default, it will download all categories. To remove a category to download, simply comment out the line
-in the `downloaders` variable in `main.py`.
+The program will download all categories in the `categories.json` file with value set to 1.
+To remove a category to download, simply change the value to 0 in the said file.
 
 
 ### Defaults
@@ -42,18 +35,15 @@ VIDEO_QUALITY = '240p'
 DOWNLOAD_ROOT = 'files/%s/' % (LANGUAGE_KEY,)
 WITH_SUBTITLES = False
 
-DOWNLOAD_PATH = {
-    'Morning Worship': DOWNLOAD_ROOT + 'morning_worship/',
-    'Original Songs': DOWNLOAD_ROOT + 'original_songs/',
-    'Bible Books': DOWNLOAD_ROOT + 'bible_books/',
-    'New World Translation Audio': DOWNLOAD_ROOT + 'nwt_audio/',
-    'Original Songs Music Video': DOWNLOAD_ROOT + 'original_songs_vod/',
-}
-
+DATED_CATEGORIES = []
 CHECK_FIlE_INTEGRITY = True
+CHECK_FOR_NEW_CATEGORIES = True
 ```
 
+`DATED_CATEGORIES` are a list of categories. The files under these categories will be downloaded with a datestamp prepended to the file title.
+
 To change any of these settings, simply edit `config.py` and run `main.py`.
+
 
 ## IS THIS LEGAL?
 Yes! Under jw.org's [terms of use](https://www.jw.org/en/terms-of-use/#link2):

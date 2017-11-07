@@ -1,35 +1,24 @@
-from config import NWT_AUDIO_JSON
+from ..config import NWT_AUDIO_JSON
+from ..config import DOWNLOAD_ROOT
 
-from core import JWBroadcastingDownloader
-from core import JWBroadcastingVideoDownloader
-from core import JWBroadcastingAudioDownloader
+from ..core import JWBroadcastingDownloader
+from ..core import JWBroadcastingVideoDownloader
 
-from core.mixins import TitleWithDateNoSpaceMixin, TitleBibleBookMixin
-
-
-class VODOriginalSongsDownloader(JWBroadcastingVideoDownloader):
-
-    key = 'Original Songs Music Video'
-
-
-class OriginalSongsDownloader(JWBroadcastingAudioDownloader):
-
-    key = 'Original Songs'
-
-
-class MorningWorshipDownloader(TitleWithDateNoSpaceMixin, JWBroadcastingVideoDownloader):
-
-    key = 'Morning Worship'
+from ..core.mixins import TitleBibleBookMixin
 
 
 class BibleBooksDownloader(TitleBibleBookMixin, JWBroadcastingVideoDownloader):
 
-    key = 'Bible Books'
+    def __init__(self):
+        category = 'BibleBooks'
+        super(BibleBooksDownloader, self).__init__(category)
 
 
 class NWTAudioDownloader(JWBroadcastingDownloader):
 
-    key = 'New World Translation Audio'
+    @property
+    def download_path(self):
+        return DOWNLOAD_ROOT + 'NWTAudio/'
 
     def get_download_urls(self):
         json_url = NWT_AUDIO_JSON

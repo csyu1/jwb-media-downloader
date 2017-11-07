@@ -1,12 +1,12 @@
 import os
+import re
 import json
 import hashlib
 import requests
 from os.path import splitext
 from urllib import request
 
-from config import *
-from constants import PRIMARY_CATEGORIES
+from ..config import *
 
 
 def md5(fname):
@@ -17,10 +17,12 @@ def md5(fname):
     return hash_md5.hexdigest()
 
 
-class JWBroadcastingDownloader(object):
+class JWBroadcastingDownloader:
 
-    def __init__(self):
+    def __init__(self, category=None, dated_title=False):
         self.download_info = []
+        self.category = category
+        self.dated_title = dated_title
 
     def download_json(self, json_url):
         r = requests.get(json_url, proxies=PROXY_DICT)
@@ -28,20 +30,33 @@ class JWBroadcastingDownloader(object):
         return media
 
     def get_title(self, media, file_meta):
-        return media['title']
+        if not self.dated_title:
+            return media['title']
+        else:
+            title = media['title']
+            url = file_meta['progressiveDownloadURL']
+            expression = r'20\d\d\d\d_\d\d'
+            date = re.search(expression, url).group(0)
+            title_with_date = '[%s]%s' % (date, title)
+            return title_with_date
 
     def get_download_urls(self):
-        json_url = JWB_API + PRIMARY_CATEGORIES[self.key]
+        json_url = JWB_API + self.category
         media_json = self.download_json(json_url)
         media_list = media_json['category']['media']
         for media in media_list:
             self.download_info.append(self.get_relevant_download_info(media))
 
+    @property
+    def download_path(self):
+        return DOWNLOAD_ROOT + self.category + '/'
+
     def download_media(self):
         for (url, title, checksum) in self.download_info:
             _, extension = splitext(url)
             print(self.download_file(
-                DOWNLOAD_PATH[self.key], url, title, extension, checksum))
+                self.download_path,
+                url, title, extension, checksum))
 
     def check_if_file_does_not_exist_or_corrupt(self, path, file, checksum):
         # TODO: Add checksum
@@ -82,6 +97,10 @@ class JWBroadcastingDownloader(object):
 
 class JWBroadcastingVideoDownloader(JWBroadcastingDownloader):
 
+    @property
+    def download_path(self):
+        return DOWNLOAD_ROOT + 'video/' + self.category + '/'
+
     def get_relevant_download_info(self, media):
         # default to first if no media found
         file_index = 0
@@ -93,4 +112,7 @@ class JWBroadcastingVideoDownloader(JWBroadcastingDownloader):
 
 
 class JWBroadcastingAudioDownloader(JWBroadcastingDownloader):
-    pass
+
+    @property
+    def download_path(self):
+        return DOWNLOAD_ROOT + 'audio/' + self.category + '/'
