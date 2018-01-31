@@ -25,6 +25,8 @@ def get_video_categories():
     video_list = json.loads(r.text)['category']['media']
     for video in video_list:
         video_primary_categories.add(video['primaryCategory'])
+    # Add manually since under tag "AllVideosExclude"
+    video_primary_categories.add("VODSJJMeetings")
     return video_primary_categories
 
 
