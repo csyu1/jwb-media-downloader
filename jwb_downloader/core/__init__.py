@@ -58,27 +58,34 @@ class JWBroadcastingDownloader:
                 self.download_path,
                 url, title, extension, checksum))
 
-    def check_if_file_does_not_exist_or_corrupt(self, path, file, checksum):
-        # TODO: Add checksum
-        if file in os.listdir(path) and checksum == md5(path + file):
-            return False
-        return True
+    def check_if_file_exists(self, path, filename):
+        return filename in os.listdir(path)
+
+    def valid_checksum(self, path, filename, checksum):
+        return md5(path + filename) == checksum
 
     def download_file(self, path, url, title, extension, checksum):
-        status = title + ": {}"
+        status_info = title + ": {}"
+        status = None
+        filename = title + extension
         if not os.path.exists(path):
             os.makedirs(path)
 
-        if not self.check_if_file_does_not_exist_or_corrupt(
-                path, title + extension, checksum):
-            return status.format("File present")
+        if self.check_if_file_exists(path, filename):
+            if self.valid_checksum(path, filename, checksum) or \
+                not UPDATE_WITH_NEW_VERSION:
+                return status_info.format("File Present")
+            else:
+                status = "Updated"
+        else:
+            status = "Ok"
 
         try:
             request.urlretrieve(url, path + title + extension)
         except Exception:
-            return status.format("Error")
+            status = "Error"
 
-        return status.format("Ok")
+        return status_info.format(status)
 
     def __call__(self):
         self.get_download_urls()
