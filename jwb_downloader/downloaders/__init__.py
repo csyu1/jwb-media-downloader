@@ -9,16 +9,19 @@ from ..core.mixins import TitleBibleBookMixin
 
 class BibleBooksDownloader(TitleBibleBookMixin, JWBroadcastingVideoDownloader):
 
-    def __init__(self):
+    def __init__(self, language_key=None):
         category = 'BibleBooks'
-        super(BibleBooksDownloader, self).__init__(category)
+        if not language_key:
+            self.language = 'E'
+        self.language = language_key
+        super(BibleBooksDownloader, self).__init__(category, language_key=language_key)
 
 
 class NWTAudioDownloader(JWBroadcastingDownloader):
 
     @property
     def download_path(self):
-        return DOWNLOAD_ROOT + 'NWTAudio/'
+        return self.download_root + 'NWTAudio/'
 
     def get_download_urls(self):
         json_url = NWT_AUDIO_JSON

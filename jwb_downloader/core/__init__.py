@@ -2,10 +2,12 @@ import os
 import re
 import json
 import hashlib
-import requests
+
 from os.path import splitext
 from urllib import request
 
+import click
+import requests
 from ..config import *
 
 
@@ -29,6 +31,9 @@ class JWBroadcastingDownloader:
         self.download_info = []
         self.category = category
         self.dated_title = dated_title
+        self.download_root = DOWNLOAD_ROOT.format(self.language_key)
+        self.jwb_api = JWB_API.format(self.language_key)
+        self.current_file_status = ''
 
     def download_json(self, json_url):
         r = requests.get(json_url, proxies=PROXY_DICT)
@@ -47,7 +52,7 @@ class JWBroadcastingDownloader:
             return title_with_date
 
     def get_download_urls(self):
-        json_url = JWB_API + self.category
+        json_url = self.jwb_api + self.category
         media_json = self.download_json(json_url)
         media_list = media_json['category']['media']
         for media in media_list:
@@ -55,14 +60,15 @@ class JWBroadcastingDownloader:
 
     @property
     def download_path(self):
-        return DOWNLOAD_ROOT + self.category + '/'
+        return f"{self.download_root}{self.category}/"
 
     def download_media(self):
         for (url, title, checksum) in self.download_info:
             _, extension = splitext(url)
-            print(self.download_file(
+            self.download_file(
                 self.download_path,
-                url, title, extension, checksum))
+                url, title, extension, checksum)
+            print(self.current_file_status)
 
     def check_if_file_exists(self, path, filename):
         return filename in os.listdir(path)
@@ -71,8 +77,8 @@ class JWBroadcastingDownloader:
         return md5(path + filename) == checksum
 
     def download_file(self, path, url, title, extension, checksum):
-        status_info = title + ": {}"
-        status = None
+        self.current_file_status = title + ": {}"
+
         filename = title + extension
         if not os.path.exists(path):
             os.makedirs(path)
@@ -80,18 +86,17 @@ class JWBroadcastingDownloader:
         if self.check_if_file_exists(path, filename):
             if self.valid_checksum(path, filename, checksum) or \
                 not UPDATE_WITH_NEW_VERSION:
-                return status_info.format("File Present")
+                self.current_file_status = f"{title}: Present"
             else:
-                status = "Updated"
+                self.current_file_status = f"{title}: Updated"
         else:
-            status = "Ok"
+            self.current_file_status = f"{title}: Ok"
 
         try:
             request.urlretrieve(url, path + title + extension)
         except Exception:
-            status = "Error"
+            self.current_file_status = f"{title}: Present"
 
-        return status_info.format(status)
 
     def __call__(self):
         self.get_download_urls()
@@ -112,7 +117,7 @@ class JWBroadcastingVideoDownloader(JWBroadcastingDownloader):
 
     @property
     def download_path(self):
-        return DOWNLOAD_ROOT + 'video/' + self.category + '/'
+        return self.download_root + 'video/' + self.category + '/'
 
     def get_relevant_download_info(self, media):
         # default to first if no media found
@@ -128,4 +133,4 @@ class JWBroadcastingAudioDownloader(JWBroadcastingDownloader):
 
     @property
     def download_path(self):
-        return DOWNLOAD_ROOT + 'audio/' + self.category + '/'
+        return self.download_root + 'audio/' + self.category + '/'
