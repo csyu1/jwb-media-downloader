@@ -1,3 +1,5 @@
+import click
+
 from jwb_downloader.config import DATED_CATEGORIES
 from jwb_downloader.core.category_crawler import update_categories
 from jwb_downloader.core import JWBroadcastingVideoDownloader
@@ -5,11 +7,17 @@ from jwb_downloader.core import JWBroadcastingAudioDownloader
 from jwb_downloader.downloaders import BibleBooksDownloader
 from jwb_downloader.downloaders import NWTAudioDownloader
 
-if __name__ == '__main__':
-    categories = update_categories()
+@click.group()
+def main():
+    pass
+
+@main.command()
+@click.option('--file', '-f', help="Select appropriate categories")
+def download(file=None):
+    categories = update_categories(file)
     for key, value in categories['video'].items():
         if value == 1:
-            print("~%s~" % key)
+            click.echo(">> Downloading %s category" % key)
             if key == 'BibleBooks':
                 # different title format based on Bible ordering
                 downloader = BibleBooksDownloader()
@@ -19,10 +27,19 @@ if __name__ == '__main__':
 
     for key, value in categories['audio'].items():
         if value == 1:
-            print("~%s~" % key)
+            click.echo(">> Downloading %s category" % key)
             if key == 'NWTAudio':
                 # different download methods since downloaded from jw.org instead of tv.jw.org API
                 downloader = NWTAudioDownloader()
             else:
                 downloader = JWBroadcastingAudioDownloader(key)
             downloader()
+
+@main.command()
+@click.option('--file', '-f', help="Update the Categories File")
+def update(file=None):
+    update_categories(file)
+    click.echo("Updated")
+
+if __name__ == '__main__':
+    main()

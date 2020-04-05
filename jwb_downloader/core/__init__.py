@@ -19,7 +19,13 @@ def md5(fname):
 
 class JWBroadcastingDownloader:
 
-    def __init__(self, category=None, dated_title=False):
+    def __init__(self, category=None, dated_title=False, language_key=None):
+
+        if not language_key:
+            self.language_key = 'E'
+        else:
+            self.language_key = language_key
+
         self.download_info = []
         self.category = category
         self.dated_title = dated_title

@@ -30,19 +30,21 @@ def get_video_categories():
     return video_primary_categories
 
 
-def update_categories():
+def update_categories(categories_filename=None):
+    if categories_filename is None:
+        categories_filename = 'categories.json'
 
     audio_primary_categories = None
     video_primary_categories = None
 
     try:
-        with open('categories.json') as cat_file:
+        with open(categories_filename) as cat_file:
             dictionary = json.loads(cat_file.read())
             if not all(cat in dictionary.keys() for cat in ('audio', 'video')):
                 raise Exception('Improper JSON Configuraiton')
     except Exception as e:
         print("Error:", e)
-        print("Resetting categories.json file.")
+        print(f"Resetting {categories_filename} file.")
         dictionary = {
             "video": {},
             "audio": {}
@@ -54,6 +56,6 @@ def update_categories():
         dictionary['video'].update({v: 0 for v in video_primary_categories if v not in dictionary['video']})
         dictionary['audio'].update({a: 0 for a in audio_primary_categories if a not in dictionary['audio']})
 
-    with open('categories.json', 'w') as cat_file:
+    with open(categories_filename, 'w') as cat_file:
         json.dump(dictionary, cat_file, indent=2, sort_keys=True)
     return dictionary
